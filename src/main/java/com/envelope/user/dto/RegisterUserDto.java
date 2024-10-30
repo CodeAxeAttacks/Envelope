@@ -10,7 +10,7 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @Getter
 @ToString
-public class CreateUserDto {
+public class RegisterUserDto {
 
     @Email(message = "Field \"email\" must have an email format")
     private final String email;

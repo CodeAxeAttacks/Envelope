@@ -1,7 +1,5 @@
 package com.envelope.user.dto;
 
-import com.envelope.user.model.Role;
-import com.envelope.user.model.Status;
 import lombok.Builder;
 import lombok.Getter;
 

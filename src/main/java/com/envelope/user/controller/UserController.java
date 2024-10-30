@@ -1,6 +1,6 @@
 package com.envelope.user.controller;
 
-import com.envelope.user.dto.CreateUserDto;
+import com.envelope.user.dto.RegisterUserDto;
 import com.envelope.user.dto.ResultUserDto;
 import com.envelope.user.service.UserService;
 import jakarta.validation.Valid;
@@ -20,7 +20,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResultUserDto register(@RequestBody @Valid CreateUserDto createUserDto) {
+    public ResultUserDto register(@RequestBody @Valid RegisterUserDto createUserDto) {
         log.info("Register user: {}", createUserDto);
         return userService.register(createUserDto);
     }
