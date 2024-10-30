@@ -1,6 +1,8 @@
 package com.envelope.exception;
 
 import com.envelope.exception.exceptions.ObjectAlreadyExistsException;
+import com.envelope.exception.exceptions.ObjectNotFoundException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,9 +17,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleObjectAlreadyExistsException(ObjectAlreadyExistsException e) {
         return new ErrorResponse(
-                "ObjectNotFound",
-                e.getMessage()
-        );
+                "AlreadyExists",
+                e.getMessage());
     }
 
     @ExceptionHandler
@@ -26,13 +27,20 @@ public class GlobalExceptionHandler {
         return resolveMethodArgumentNotValidException(e);
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleObjectNotFoundException(ObjectNotFoundException e) {
+        return new ErrorResponse(
+                "NotFound",
+                e.getMessage());
+    }
+
     // Default error message is too big and tricky to read
     private ErrorResponse resolveMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         BindingResult bindingResult = e.getBindingResult();
         return new ErrorResponse(
                 "NotValid",
-                bindingResult.getFieldError().getDefaultMessage()
-        );
+                bindingResult.getFieldError().getDefaultMessage());
     }
 
 }

@@ -2,7 +2,7 @@ package com.envelope.user.service;
 
 import com.envelope.exception.exceptions.ObjectAlreadyExistsException;
 import com.envelope.user.dao.UserRepository;
-import com.envelope.user.dto.CreateUserDto;
+import com.envelope.user.dto.RegisterUserDto;
 import com.envelope.user.dto.ResultUserDto;
 import com.envelope.user.model.User;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public ResultUserDto register(CreateUserDto createUserDto) {
+    public ResultUserDto register(RegisterUserDto createUserDto) {
         if (userRepository.findByEmail(createUserDto.getEmail()).isEmpty()) {
             String errorMessage = String.format("User with email %s already exists", createUserDto.getEmail());
             log.warn(errorMessage);
