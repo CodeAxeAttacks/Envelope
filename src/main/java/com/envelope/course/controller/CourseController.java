@@ -2,10 +2,14 @@ package com.envelope.course.controller;
 
 import com.envelope.course.model.Course;
 import com.envelope.course.service.CourseService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import com.envelope.course.dto.CreateCourseDto;
+import com.envelope.course.dto.CourseDto;
+import com.envelope.exception.exceptions.ObjectNotFoundException;
 
 @RestController
 @RequestMapping("/courses")
@@ -15,38 +19,48 @@ public class CourseController {
     private final CourseService courseService;
 
     @PostMapping
-    public ResponseEntity<Course> createCourse(@RequestBody Course course) {
-        Course createdCourse = courseService.createCourse(course);
-        return ResponseEntity.ok(createdCourse);
+    public ResponseEntity<CourseDto> createCourse(@RequestBody @Valid CreateCourseDto createCourseDto) {
+        Course course = courseService.createCourse(createCourseDto);
+        return ResponseEntity.ok(courseService.convertToDto(course));
     }
 
     @GetMapping
-    public ResponseEntity<List<Course>> getAllCourses() {
+    public ResponseEntity<List<CourseDto>> getAllCourses() {
         List<Course> courses = courseService.getAllCourses();
-        return ResponseEntity.ok(courses);
+        // Преобразование списка в DTO
+        List<CourseDto> courseDtos = courses.stream()
+                .map(courseService::convertToDto)
+                .toList();
+        return ResponseEntity.ok(courseDtos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
-        return courseService.getCourseById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<CourseDto> getCourseById(@PathVariable Long id) {
+        try {
+            Course course = courseService.getCourseById(id);
+            return ResponseEntity.ok(courseService.convertToDto(course));
+        } catch (ObjectNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Course> updateCourse(@PathVariable Long id, @RequestBody Course updatedCourse) {
+    public ResponseEntity<CourseDto> updateCourse(@PathVariable Long id, @RequestBody Course updatedCourse) {
         try {
             Course course = courseService.updateCourse(id, updatedCourse);
-            return ResponseEntity.ok(course);
-        } catch (RuntimeException e) {
+            return ResponseEntity.ok(courseService.convertToDto(course));
+        } catch (ObjectNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
-        courseService.deleteCourse(id);
-        return ResponseEntity.noContent().build();
+        try {
+            courseService.deleteCourse(id);
+            return ResponseEntity.noContent().build();
+        } catch (ObjectNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
-
 }
