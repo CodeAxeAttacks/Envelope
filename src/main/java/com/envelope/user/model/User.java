@@ -39,12 +39,12 @@ public class User {
     @CreationTimestamp
     private Instant createdAt;
 
-//    @Column(name = "role", nullable = false)
-//    @Enumerated(EnumType.STRING)
-//    private Role role;
-//
-//    @Column(name = "status", nullable = false)
-//    @Enumerated(EnumType.STRING)
-//    private Status status;
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;    
 
 }

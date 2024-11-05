@@ -1,6 +1,9 @@
 package com.envelope.instructor.model;
 
+import java.util.List;
+
 import com.envelope.user.model.User;
+import com.envelope.vehicle.model.Vehicle;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -44,5 +48,13 @@ public class Instructor {
 
     @Column(name = "rating", nullable = false)
     private Float rating;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "instructor_id", nullable = false)
+    private List<InstructorService> services;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "instructor_id", nullable = true)
+    private List<Vehicle> vehicles;
 
 }

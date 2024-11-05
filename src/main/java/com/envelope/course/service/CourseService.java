@@ -1,37 +1,45 @@
 package com.envelope.course.service;
 
 import com.envelope.course.dao.CourseRepository;
-import com.envelope.course.dto.CourseDto;
-import com.envelope.course.dto.CreateCourseDto;
+import com.envelope.course.dto.RegisterCourseDto;
+import com.envelope.course.dto.ResultCourseDto;
 import com.envelope.course.model.Course;
-import com.envelope.exception.exceptions.ObjectNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.envelope.driving_school.dao.DrivingSchoolRepository;
+import com.envelope.exception.exceptions.ObjectAlreadyExistsException;
 
-import java.util.List;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CourseService {
 
     private final CourseRepository courseRepository;
+    private final DrivingSchoolRepository drivingSchoolRepository;
 
-    public Course createCourse(CreateCourseDto createCourseDto) {
-        Course course = Course.builder()
-                .name(createCourseDto.getName())
-                .price(createCourseDto.getPrice())
-                .duration(createCourseDto.getDuration())
-                .description(createCourseDto.getDescription())
-                .vehicleCategory(createCourseDto.getVehicleCategory())
-                .studyFormat(createCourseDto.getStudyFormat())
-                .build();
-        return courseRepository.save(course);
-    }
+    public ResultCourseDto register(RegisterCourseDto registerCourseDto) {
+        if (drivingSchoolRepository.findById(registerCourseDto.getDrivingSchoolId()).isEmpty()) {
+            String errorMessage = String.format("Driving school with id %d does not exist",
+                    registerCourseDto.getDrivingSchoolId());
+            log.warn(errorMessage);
+            throw new ObjectAlreadyExistsException(errorMessage);
+        }
 
-    public CourseDto convertToDto(Course course) {
-        return CourseDto.builder()
+        Course course = courseRepository.save(Course.builder()
+                .name(registerCourseDto.getName())
+                .price(registerCourseDto.getPrice())
+                .duration(registerCourseDto.getDuration())
+                .description(registerCourseDto.getDescription())
+                .vehicleCategory(registerCourseDto.getVehicleCategory())
+                .studyFormat(registerCourseDto.getStudyFormat())
+                .build());
+
+        log.info("Course registered: {}", course);
+
+        return ResultCourseDto.builder()
                 .id(course.getId())
                 .name(course.getName())
                 .price(course.getPrice())
@@ -40,36 +48,6 @@ public class CourseService {
                 .vehicleCategory(course.getVehicleCategory())
                 .studyFormat(course.getStudyFormat())
                 .build();
-    }
-
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
-    }
-
-    public Course getCourseById(Long id) {
-        return courseRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Course not found with id " + id));
-    }
-
-    @Transactional
-    public Course updateCourse(Long id, Course updatedCourse) {
-        Course existingCourse = courseRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Course not found with id " + id));
-
-        Optional.ofNullable(updatedCourse.getName()).ifPresent(existingCourse::setName);
-        Optional.ofNullable(updatedCourse.getPrice()).ifPresent(existingCourse::setPrice);
-        Optional.ofNullable(updatedCourse.getDuration()).ifPresent(existingCourse::setDuration);
-        Optional.ofNullable(updatedCourse.getDescription()).ifPresent(existingCourse::setDescription);
-        Optional.ofNullable(updatedCourse.getVehicleCategory()).ifPresent(existingCourse::setVehicleCategory);
-        Optional.ofNullable(updatedCourse.getStudyFormat()).ifPresent(existingCourse::setStudyFormat);
-
-        return courseRepository.save(existingCourse);
-    }
-
-    public void deleteCourse(Long id) {
-        Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Course not found with id " + id));
-        courseRepository.delete(course);
     }
 
 }

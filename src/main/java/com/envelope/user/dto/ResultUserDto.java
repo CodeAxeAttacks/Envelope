@@ -5,6 +5,9 @@ import lombok.Getter;
 
 import java.time.Instant;
 
+import com.envelope.user.model.Role;
+import com.envelope.user.model.Status;
+
 @Getter
 @Builder(toBuilder = true)
 public class ResultUserDto {
@@ -21,8 +24,8 @@ public class ResultUserDto {
 
     private Instant createdAt;
 
-//    private Role role;
-//
-//    private Status status;
+    private Role role;
+
+    private Status status;
 
 }

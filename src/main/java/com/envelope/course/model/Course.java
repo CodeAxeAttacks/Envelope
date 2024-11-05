@@ -21,10 +21,10 @@ public class Course {
     private String name;
 
     @Column(name = "price", nullable = false)
-    private double price;
+    private Float price;
 
     @Column(name = "duration", nullable = false)
-    private double duration;
+    private Float duration;
 
     @Column(name = "description", nullable = false, length = 512)
     private String description;

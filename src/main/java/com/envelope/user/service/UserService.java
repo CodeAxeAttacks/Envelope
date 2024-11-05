@@ -23,15 +23,15 @@ public class UserService {
             throw new ObjectAlreadyExistsException(errorMessage);
         }
 
-        User user = User.builder()
+        User user = userRepository.save(User.builder()
                 .email(createUserDto.getEmail())
                 .password(createUserDto.getPassword())
                 .firstName(createUserDto.getFirstName())
                 .lastName(createUserDto.getLastName())
                 .phone(createUserDto.getPhone())
-                .build();
-        user = userRepository.save(user);
+                .build());
         log.info("User registered: {}", user);
+
         return ResultUserDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -39,8 +39,8 @@ public class UserService {
                 .lastName(user.getLastName())
                 .phone(user.getPhone())
                 .createdAt(user.getCreatedAt())
-//                .role(user.getRole())
-//                .status(user.getStatus())
+                .role(user.getRole())
+                .status(user.getStatus())
                 .build();
     }
 
