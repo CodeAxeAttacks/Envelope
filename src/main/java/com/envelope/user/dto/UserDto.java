@@ -5,6 +5,8 @@ import lombok.Getter;
 
 import java.time.Instant;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.envelope.user.model.Role;
 import com.envelope.user.model.Status;
 
@@ -22,6 +24,7 @@ public class UserDto {
 
     private String phone;
 
+    @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss")
     private Instant createdAt;
 
     private Role role;

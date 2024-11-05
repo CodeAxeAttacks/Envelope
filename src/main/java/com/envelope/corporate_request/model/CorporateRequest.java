@@ -37,7 +37,7 @@ import lombok.ToString;
 public class CorporateRequest {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "company_name", nullable = false, length = 64)
@@ -64,4 +64,5 @@ public class CorporateRequest {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+    
 }

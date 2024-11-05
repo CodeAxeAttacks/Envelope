@@ -1,14 +1,13 @@
 package com.envelope.user.service;
 
 import com.envelope.exception.exceptions.ObjectAlreadyExistsException;
-import com.envelope.exception.exceptions.ObjectNotFoundException;
 import com.envelope.exception.exceptions.UserNotAuthenticatedException;
 import com.envelope.security.JwtService;
 import com.envelope.user.dao.UserRepository;
 import com.envelope.user.dto.AuthUserDto;
 import com.envelope.user.dto.LoginUserDto;
+import com.envelope.user.dto.PatchUserDto;
 import com.envelope.user.dto.RegisterUserDto;
-import com.envelope.user.dto.UserDto;
 import com.envelope.user.model.Role;
 import com.envelope.user.model.Status;
 import com.envelope.user.model.User;
@@ -17,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -69,6 +67,37 @@ public class UserService {
                 .role(Role.USER)
                 .build());
         log.info("User registered: {}", user);
+        String jwt = jwtService.generateToken(user);
+
+        return AuthUserDto.builder()
+                .token(jwt)
+                .build();
+    }
+
+    public AuthUserDto patch(PatchUserDto patchUserDto) {
+        User user = jwtService.currentUser();
+
+        if (patchUserDto.getEmail() != null) {
+            if (userRepository.findByEmail(patchUserDto.getEmail()).isPresent()) {
+                String errorMessage = String.format("User with email %s already exists", patchUserDto.getEmail());
+                log.warn(errorMessage);
+                throw new ObjectAlreadyExistsException(errorMessage);
+            }
+            user.setEmail(patchUserDto.getEmail());
+        }   
+        if (patchUserDto.getFirstName() != null) 
+            user.setFirstName(patchUserDto.getFirstName());
+        if (patchUserDto.getLastName() != null) 
+            user.setLastName(patchUserDto.getLastName());
+        if (patchUserDto.getPhone() != null) 
+            user.setPhone(patchUserDto.getPhone());
+        if (user.getStatus() != null) 
+            user.setStatus(user.getStatus());
+        if (user.getRole() != null) 
+            user.setStatus(user.getStatus());
+        
+        user = userRepository.save(user);
+        log.info("User patched: {}", user);
         String jwt = jwtService.generateToken(user);
 
         return AuthUserDto.builder()

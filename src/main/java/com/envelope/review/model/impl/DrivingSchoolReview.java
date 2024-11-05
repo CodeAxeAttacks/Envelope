@@ -2,6 +2,7 @@ package com.envelope.review.model.impl;
 
 import com.envelope.driving_school.model.DrivingSchool;
 import com.envelope.review.model.Review;
+import com.envelope.user.model.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,5 +17,10 @@ public class DrivingSchoolReview extends Review {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "instructor_id")
     private DrivingSchool drivingSchool;
+
+    public DrivingSchoolReview(Float rate, String review, User user, DrivingSchool drivingSchool) {
+        super(null, rate, review, user);
+        this.drivingSchool = drivingSchool;
+    }
 
 }

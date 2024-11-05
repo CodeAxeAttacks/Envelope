@@ -2,6 +2,7 @@ package com.envelope.exception;
 
 import com.envelope.exception.exceptions.ObjectAlreadyExistsException;
 import com.envelope.exception.exceptions.ObjectNotFoundException;
+import com.envelope.exception.exceptions.NoAccessException;
 import com.envelope.exception.exceptions.UserNotAuthenticatedException;
 
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,14 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 "NotAuthenticated",
                 e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleNoAccessException(NoAccessException e) {
+        return new ErrorResponse(
+            "NoAccess",
+            e.getMessage());
     }
 
     // Default error message is too big and tricky to read
