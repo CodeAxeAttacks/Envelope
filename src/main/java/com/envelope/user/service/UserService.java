@@ -1,12 +1,24 @@
 package com.envelope.user.service;
 
 import com.envelope.exception.exceptions.ObjectAlreadyExistsException;
+import com.envelope.exception.exceptions.ObjectNotFoundException;
+import com.envelope.exception.exceptions.UserNotAuthenticatedException;
+import com.envelope.security.JwtService;
 import com.envelope.user.dao.UserRepository;
+import com.envelope.user.dto.AuthUserDto;
+import com.envelope.user.dto.LoginUserDto;
 import com.envelope.user.dto.RegisterUserDto;
-import com.envelope.user.dto.ResultUserDto;
+import com.envelope.user.dto.UserDto;
+import com.envelope.user.model.Role;
+import com.envelope.user.model.Status;
 import com.envelope.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Optional;
+
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,9 +27,33 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
-    public ResultUserDto register(RegisterUserDto createUserDto) {
-        if (userRepository.findByEmail(createUserDto.getEmail()).isEmpty()) {
+    public AuthUserDto login(LoginUserDto loginUserDto) {
+        Optional<User> userOptional = userRepository.findByEmail(loginUserDto.getEmail());
+        if (userOptional.isEmpty()) {
+            String errorMessage = String.format("User with email %s does not exist", loginUserDto.getEmail());
+            log.warn(errorMessage);
+            throw new ObjectAlreadyExistsException(errorMessage);
+        }
+
+        User user = userOptional.get();
+        if (!passwordEncoder.matches(loginUserDto.getPassword(), user.getPassword())) {
+            String errorMessage = String.format("Invalid password for user with email %s", loginUserDto.getEmail());
+            log.warn(errorMessage);
+            throw new UserNotAuthenticatedException(errorMessage);
+        }
+
+        String jwt = jwtService.generateToken(user);
+
+        return AuthUserDto.builder()
+                .token(jwt)
+                .build();
+    }
+
+    public AuthUserDto register(RegisterUserDto createUserDto) {
+        if (userRepository.findByEmail(createUserDto.getEmail()).isPresent()) {
             String errorMessage = String.format("User with email %s already exists", createUserDto.getEmail());
             log.warn(errorMessage);
             throw new ObjectAlreadyExistsException(errorMessage);
@@ -25,22 +61,18 @@ public class UserService {
 
         User user = userRepository.save(User.builder()
                 .email(createUserDto.getEmail())
-                .password(createUserDto.getPassword())
+                .password(passwordEncoder.encode(createUserDto.getPassword()))
                 .firstName(createUserDto.getFirstName())
                 .lastName(createUserDto.getLastName())
                 .phone(createUserDto.getPhone())
+                .status(Status.LOOKING_FOR_SCHOOL)
+                .role(Role.USER)
                 .build());
         log.info("User registered: {}", user);
+        String jwt = jwtService.generateToken(user);
 
-        return ResultUserDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .phone(user.getPhone())
-                .createdAt(user.getCreatedAt())
-                .role(user.getRole())
-                .status(user.getStatus())
+        return AuthUserDto.builder()
+                .token(jwt)
                 .build();
     }
 

@@ -10,7 +10,7 @@ import com.envelope.user.model.Status;
 
 @Getter
 @Builder(toBuilder = true)
-public class ResultUserDto {
+public class UserDto {
 
     private Long id;
 

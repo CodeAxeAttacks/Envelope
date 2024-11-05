@@ -11,7 +11,7 @@ import com.envelope.instructor.dto.RegisterInstructorDto;
 import com.envelope.instructor.dto.ResultInstructorDto;
 import com.envelope.instructor.model.Instructor;
 import com.envelope.user.dao.UserRepository;
-import com.envelope.user.dto.ResultUserDto;
+import com.envelope.user.dto.UserDto;
 import com.envelope.user.model.User;
 
 import lombok.RequiredArgsConstructor;
@@ -51,7 +51,7 @@ public class InstructorService {
 
         return ResultInstructorDto.builder()
                 .id(instructor.getId())
-                .user(ResultUserDto.builder()
+                .user(UserDto.builder()
                         .id(instructor.getUser().getId())
                         .email(instructor.getUser().getEmail())
                         .firstName(instructor.getUser().getFirstName())

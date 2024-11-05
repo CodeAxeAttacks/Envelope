@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.envelope.driving_school.dto.additional_service.ResultAdditionalServiceDto;
 import com.envelope.driving_school.dto.promotion.ResultPromotionDto;
-import com.envelope.user.dto.ResultUserDto;
+import com.envelope.user.dto.UserDto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +29,7 @@ public class ResultDrivingSchoolDto {
     @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss")
     private Instant createdAt;
 
-    private List<ResultUserDto> admins;
+    private List<UserDto> admins;
     
     private List<ResultAdditionalServiceDto> additionalServices;
 

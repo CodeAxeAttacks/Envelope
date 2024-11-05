@@ -2,6 +2,7 @@ package com.envelope.exception;
 
 import com.envelope.exception.exceptions.ObjectAlreadyExistsException;
 import com.envelope.exception.exceptions.ObjectNotFoundException;
+import com.envelope.exception.exceptions.UserNotAuthenticatedException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -32,6 +33,14 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleObjectNotFoundException(ObjectNotFoundException e) {
         return new ErrorResponse(
                 "NotFound",
+                e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleUserNotAuthenticatedException(UserNotAuthenticatedException e) {
+        return new ErrorResponse(
+                "NotAuthenticated",
                 e.getMessage());
     }
 
