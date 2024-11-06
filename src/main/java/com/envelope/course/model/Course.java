@@ -1,5 +1,7 @@
 package com.envelope.course.model;
 
+import com.envelope.driving_school.model.DrivingSchool;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,5 +38,9 @@ public class Course {
     @Column(name = "study_format", nullable = false)
     @Enumerated(EnumType.STRING)
     private StudyFormat studyFormat;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "driving_school_id", nullable = false)
+    private DrivingSchool drivingSchool;
 
 }

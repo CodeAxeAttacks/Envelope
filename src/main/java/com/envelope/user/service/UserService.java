@@ -14,6 +14,7 @@ import com.envelope.user.dto.UserDto;
 import com.envelope.user.model.Role;
 import com.envelope.user.model.Status;
 import com.envelope.user.model.User;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,10 +23,12 @@ import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
@@ -47,7 +50,7 @@ public class UserService {
 
     public UserDto getById(Long userId) {
         if (userId == null || userId < 0) {
-            String errorMessage = "User id must not be null or negative";
+            String errorMessage = "User's id must not be null or negative";
             log.warn(errorMessage);
             throw new InvalidInputException(errorMessage);
         }
@@ -93,6 +96,7 @@ public class UserService {
                 .build();
     }
 
+    @Transactional(readOnly = false)
     public AuthUserDto register(RegisterUserDto createUserDto) {
         if (userRepository.findByEmail(createUserDto.getEmail()).isPresent()) {
             String errorMessage = String.format("User with email %s already exists", createUserDto.getEmail());
@@ -117,6 +121,7 @@ public class UserService {
                 .build();
     }
 
+    @Transactional(readOnly = false)
     public AuthUserDto patch(PatchUserDto patchUserDto) {
         User user = jwtService.currentUser();
 

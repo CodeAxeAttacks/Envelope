@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.envelope.driving_school.dao.AdditionalServiceRepository;
 import com.envelope.driving_school.dao.DrivingSchoolRepository;
@@ -31,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class DrivingSchoolService {
 
     private final DrivingSchoolRepository drivingSchoolRepository;
@@ -38,6 +40,7 @@ public class DrivingSchoolService {
     private final PromotionRepository promotionRepository;
     private final JwtService jwtService;
 
+    @Transactional(readOnly = false)
     public DrivingSchoolDto register(RegisterDrivingSchoolDto registerDrivingSchoolDto) {
         User user = jwtService.currentUser();
 
@@ -80,6 +83,7 @@ public class DrivingSchoolService {
                 .build();
     }
 
+    @Transactional(readOnly = false)
     public AdditionalServiceDto addAdditionalService(AddAdditionalServiceDto addAdditionalServiceDto,
             Long drivingSchoolId) {
         User user = jwtService.currentUser();
@@ -116,6 +120,7 @@ public class DrivingSchoolService {
                 .build();
     }
 
+    @Transactional(readOnly = false)
     public PromotionDto addPromotion(AddPromotionDto addPromotionDto, Long drivingSchoolId) {
         User user = jwtService.currentUser();
 

@@ -1,6 +1,9 @@
 package com.envelope.instructor.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +31,24 @@ import lombok.extern.slf4j.Slf4j;
 public class InstructorController {
 
     private final InstructorService service;
+
+    @GetMapping
+    public List<InstructorDto> getAll() {
+        log.info("Get all instructors");
+        return service.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public InstructorDto getById(@PathVariable(name = "id") Long instructorId) {
+        log.info("Get an instructor with id {}", instructorId);
+        return service.getById(instructorId);
+    }
+
+    @GetMapping("/{id}/service")
+    public List<InstructorServiceDto> getAllInstructorServicesByInstructorId(@PathVariable(name = "id") Long instructorId) {
+        log.info("Get al; instructor's with id {} services", instructorId);
+        return service.getAllInstructorServicesByInstructorId(instructorId);
+    }
 
     @PostMapping
     public InstructorDto register(@RequestBody @Valid RegisterInstructorDto registerInstructorDto) {

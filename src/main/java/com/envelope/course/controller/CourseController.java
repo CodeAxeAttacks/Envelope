@@ -11,16 +11,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/courses")
+@RequestMapping("/driving-school")
 @RequiredArgsConstructor
 @Slf4j
 public class CourseController {
 
     private final CourseService service;
 
-    public CourseDto register(@RequestBody @Valid RegisterCourseDto registerCourseDto) {
-        log.info("Register course: {}", registerCourseDto);
-        return service.register(registerCourseDto);
+    @PostMapping("/{id}/course")
+    public CourseDto register(@RequestBody @Valid RegisterCourseDto registerCourseDto, @PathVariable Long drivingSchoolId) {
+        log.info("Register course to driving school with id {}: {}", drivingSchoolId, registerCourseDto);
+        return service.register(registerCourseDto, drivingSchoolId);
     }
 
 }

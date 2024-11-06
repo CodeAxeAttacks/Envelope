@@ -15,6 +15,4 @@ public class PatchInstructorDto {
 
     private final Integer experience;
 
-    private final Float rating;
-
 }

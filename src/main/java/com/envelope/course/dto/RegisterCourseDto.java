@@ -4,7 +4,6 @@ import com.envelope.course.model.StudyFormat;
 import com.envelope.course.model.VehicleCategory;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +33,5 @@ public class RegisterCourseDto {
 
     @NotNull(message = "Field \"studyFormat\" must not be null")
     private final StudyFormat studyFormat;
-
-    @NotNull(message = "Field \"drivingSchoolId\" must not be null")
-    @Positive(message = "Field \"drivingSchoolId\" must be positive")
-    private final Long drivingSchoolId;
 
 }

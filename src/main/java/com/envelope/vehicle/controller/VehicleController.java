@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,11 +17,16 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class VehicleController {
 
-    private final VehicleService vehicleService;
+    private final VehicleService service;
+
+    public List<VehicleDto> getAll() {
+        log.info("Get all vehicles");
+        return service.getALl();
+    }
 
     @PostMapping
     public VehicleDto createVehicle(@RequestBody @Valid VehicleDto vehicleDto) {
         log.info("Creating vehicle: {}", vehicleDto);
-        return vehicleService.createVehicle(vehicleDto);
+        return service.createVehicle(vehicleDto);
     }
 }

@@ -1,7 +1,5 @@
 package com.envelope.instructor.dto.instructor;
 
-import java.util.List;
-
 import lombok.Builder;
 import lombok.Getter;
 
