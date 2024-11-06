@@ -1,7 +1,7 @@
 package com.envelope.course.controller;
 
 import com.envelope.course.dto.RegisterCourseDto;
-import com.envelope.course.dto.ResultCourseDto;
+import com.envelope.course.dto.CourseDto;
 import com.envelope.course.service.CourseService;
 
 import jakarta.validation.Valid;
@@ -18,7 +18,7 @@ public class CourseController {
 
     private final CourseService service;
 
-    public ResultCourseDto register(@RequestBody @Valid RegisterCourseDto registerCourseDto) {
+    public CourseDto register(@RequestBody @Valid RegisterCourseDto registerCourseDto) {
         log.info("Register course: {}", registerCourseDto);
         return service.register(registerCourseDto);
     }

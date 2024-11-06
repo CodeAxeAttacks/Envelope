@@ -49,8 +49,4 @@ public class Instructor {
     @Column(name = "rating", nullable = false)
     private Float rating;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "instructor_id", nullable = true)
-    private List<Vehicle> vehicles;
-
 }

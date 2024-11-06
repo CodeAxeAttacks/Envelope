@@ -18,9 +18,5 @@ public class InstructorDto {
     private String description;
 
     private Float rating;
-
-    private List<Long> serviceIds;
-
-    private List<Long> vehicleIds;
     
 }

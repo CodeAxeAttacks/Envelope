@@ -1,6 +1,8 @@
 package com.envelope.user.service;
 
+import com.envelope.exception.exceptions.InvalidInputException;
 import com.envelope.exception.exceptions.ObjectAlreadyExistsException;
+import com.envelope.exception.exceptions.ObjectNotFoundException;
 import com.envelope.exception.exceptions.UserNotAuthenticatedException;
 import com.envelope.security.JwtService;
 import com.envelope.user.dao.UserRepository;
@@ -8,12 +10,14 @@ import com.envelope.user.dto.AuthUserDto;
 import com.envelope.user.dto.LoginUserDto;
 import com.envelope.user.dto.PatchUserDto;
 import com.envelope.user.dto.RegisterUserDto;
+import com.envelope.user.dto.UserDto;
 import com.envelope.user.model.Role;
 import com.envelope.user.model.Status;
 import com.envelope.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +31,45 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+
+    public List<UserDto> getAll() {
+        return userRepository.findAll().stream()
+                .map(user -> UserDto.builder()
+                        .id(user.getId())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .createdAt(user.getCreatedAt())
+                        .role(user.getRole())
+                        .status(user.getStatus())
+                        .build())
+                .toList();
+    }
+
+    public UserDto getById(Long userId) {
+        if (userId == null || userId < 0) {
+            String errorMessage = "User id must not be null or negative";
+            log.warn(errorMessage);
+            throw new InvalidInputException(errorMessage);
+        }
+
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            String errorMessage = String.format("User with id %d does not exist", userId);
+            log.warn(errorMessage);
+            throw new ObjectNotFoundException(errorMessage);
+        }
+        User user = userOptional.get();
+
+        return UserDto.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
+                .createdAt(user.getCreatedAt())
+                .role(user.getRole())
+                .status(user.getStatus())
+                .build();
+    }
 
     public AuthUserDto login(LoginUserDto loginUserDto) {
         Optional<User> userOptional = userRepository.findByEmail(loginUserDto.getEmail());
@@ -84,18 +127,18 @@ public class UserService {
                 throw new ObjectAlreadyExistsException(errorMessage);
             }
             user.setEmail(patchUserDto.getEmail());
-        }   
-        if (patchUserDto.getFirstName() != null) 
+        }
+        if (patchUserDto.getFirstName() != null)
             user.setFirstName(patchUserDto.getFirstName());
-        if (patchUserDto.getLastName() != null) 
+        if (patchUserDto.getLastName() != null)
             user.setLastName(patchUserDto.getLastName());
-        if (patchUserDto.getPhone() != null) 
+        if (patchUserDto.getPhone() != null)
             user.setPhone(patchUserDto.getPhone());
-        if (user.getStatus() != null) 
+        if (user.getStatus() != null)
             user.setStatus(user.getStatus());
-        if (user.getRole() != null) 
+        if (user.getRole() != null)
             user.setStatus(user.getStatus());
-        
+
         user = userRepository.save(user);
         log.info("User patched: {}", user);
         String jwt = jwtService.generateToken(user);

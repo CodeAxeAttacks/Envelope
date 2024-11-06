@@ -2,7 +2,7 @@ package com.envelope.course.service;
 
 import com.envelope.course.dao.CourseRepository;
 import com.envelope.course.dto.RegisterCourseDto;
-import com.envelope.course.dto.ResultCourseDto;
+import com.envelope.course.dto.CourseDto;
 import com.envelope.course.model.Course;
 import com.envelope.driving_school.dao.DrivingSchoolRepository;
 import com.envelope.exception.exceptions.ObjectAlreadyExistsException;
@@ -20,7 +20,7 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final DrivingSchoolRepository drivingSchoolRepository;
 
-    public ResultCourseDto register(RegisterCourseDto registerCourseDto) {
+    public CourseDto register(RegisterCourseDto registerCourseDto) {
         if (drivingSchoolRepository.findById(registerCourseDto.getDrivingSchoolId()).isEmpty()) {
             String errorMessage = String.format("Driving school with id %d does not exist",
                     registerCourseDto.getDrivingSchoolId());
@@ -39,7 +39,7 @@ public class CourseService {
 
         log.info("Course registered: {}", course);
 
-        return ResultCourseDto.builder()
+        return CourseDto.builder()
                 .id(course.getId())
                 .name(course.getName())
                 .price(course.getPrice())

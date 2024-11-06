@@ -2,6 +2,7 @@ package com.envelope.exception;
 
 import com.envelope.exception.exceptions.ObjectAlreadyExistsException;
 import com.envelope.exception.exceptions.ObjectNotFoundException;
+import com.envelope.exception.exceptions.InvalidInputException;
 import com.envelope.exception.exceptions.NoAccessException;
 import com.envelope.exception.exceptions.UserNotAuthenticatedException;
 
@@ -30,6 +31,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidInputException(InvalidInputException e) {
+        return new ErrorResponse(
+                "InvalidInput",
+                e.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleObjectNotFoundException(ObjectNotFoundException e) {
         return new ErrorResponse(
@@ -49,8 +58,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleNoAccessException(NoAccessException e) {
         return new ErrorResponse(
-            "NoAccess",
-            e.getMessage());
+                "NoAccess",
+                e.getMessage());
     }
 
     // Default error message is too big and tricky to read

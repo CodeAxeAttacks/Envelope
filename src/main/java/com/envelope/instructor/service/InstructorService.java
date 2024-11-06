@@ -1,11 +1,13 @@
 package com.envelope.instructor.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.envelope.exception.exceptions.ObjectAlreadyExistsException;
 import com.envelope.exception.exceptions.ObjectNotFoundException;
+import com.envelope.exception.exceptions.InvalidInputException;
 import com.envelope.exception.exceptions.NoAccessException;
 import com.envelope.instructor.dao.InstructorRepository;
 import com.envelope.instructor.dao.InstructorServiceRepository;
@@ -18,6 +20,7 @@ import com.envelope.instructor.dto.instructor.PatchInstructorDto;
 import com.envelope.instructor.model.Instructor;
 import com.envelope.security.JwtService;
 import com.envelope.user.dao.UserRepository;
+import com.envelope.user.dto.UserDto;
 import com.envelope.user.model.Role;
 import com.envelope.user.model.User;
 
@@ -35,6 +38,42 @@ public class InstructorService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
 
+    public List<InstructorDto> getAll() {
+        return instructorRepository.findAll().stream()
+                .map(instructor -> InstructorDto.builder()
+                        .id(instructor.getId())
+                        .userId(instructor.getUser().getId())
+                        .experience(instructor.getExperience())
+                        .description(instructor.getDescription())
+                        .rating(instructor.getRating())
+                        .build())
+                .toList();
+    }
+
+    public InstructorDto getById(Long instructorId) {
+        if (instructorId == null || instructorId < 0) {
+            String errorMessage = "User id must not be null or negative";
+            log.warn(errorMessage);
+            throw new InvalidInputException(errorMessage);
+        }
+
+        Optional<Instructor> instructorOptional = instructorRepository.findById(instructorId);
+        if (instructorOptional.isEmpty()) {
+            String errorMessage = String.format("Instructor with id %d does not exist", instructorId);
+            log.warn(errorMessage);
+            throw new ObjectNotFoundException(errorMessage);
+        }
+        Instructor instructor = instructorOptional.get();
+
+        return InstructorDto.builder()
+                .id(instructor.getId())
+                .userId(instructor.getUser().getId())
+                .experience(instructor.getExperience())
+                .description(instructor.getDescription())
+                .rating(instructor.getRating())
+                .build();
+    }
+
     public InstructorDto register(RegisterInstructorDto registerInstructorDto) {
         System.out.println(0);
         User user = jwtService.currentUser();
@@ -50,7 +89,6 @@ public class InstructorService {
                 .experience(registerInstructorDto.getExperience())
                 .description(registerInstructorDto.getDescription())
                 .rating(0f)
-                .vehicles(Collections.emptyList())
                 .build();
 
         if (user.getRole() == Role.USER)
@@ -70,8 +108,6 @@ public class InstructorService {
                 .experience(instructor.getExperience())
                 .description(instructor.getDescription())
                 .rating(instructor.getRating())
-                .serviceIds(Collections.emptyList())
-                .vehicleIds(Collections.emptyList())
                 .build();
     }
 
@@ -115,7 +151,8 @@ public class InstructorService {
 
         Instructor instructor = instructorRepository.findByUser(user).get();
 
-        Optional<com.envelope.instructor.model.InstructorService> serviceOptional = instructorServiceRepository.findById(serviceId);
+        Optional<com.envelope.instructor.model.InstructorService> serviceOptional = instructorServiceRepository
+                .findById(serviceId);
         if (serviceOptional.isEmpty()) {
             String errorMessage = String.format("Instructor service with id %d does not exits", serviceId);
             log.warn(errorMessage);
@@ -124,7 +161,8 @@ public class InstructorService {
         com.envelope.instructor.model.InstructorService service = serviceOptional.get();
 
         if (!service.getInstructor().getId().equals(instructor.getId())) {
-            String errorMessage = String.format("Instructor with id %d does not have a service with id %d", instructor.getId(), serviceId);
+            String errorMessage = String.format("Instructor with id %d does not have a service with id %d",
+                    instructor.getId(), serviceId);
             log.warn(errorMessage);
             throw new NoAccessException(errorMessage);
         }
@@ -159,24 +197,15 @@ public class InstructorService {
                 .experience(instructor.getExperience())
                 .description(instructor.getDescription())
                 .rating(instructor.getRating())
-                .serviceIds(Collections.emptyList())
-                .vehicleIds(Collections.emptyList())
                 .build();
     }
 
-    public InstructorServiceDto patchInstructorService(Long serviceId, PatchInstructorServiceDto patchInstructorServiceDto) {
-        Optional<com.envelope.instructor.model.InstructorService> service = instructorServiceRepository.findById(serviceId);
-
-        // if (patchInstructorServiceDto.getName() != null)
-        //     service.setName(patchInstructorServiceDto.getName());
-        // if (patchInstructorServiceDto.getDescription() != null) 
-        //     service.setDescription(patchInstructorServiceDto.getDescription());
-        // if (patchInstructorServiceDto.getPrice() != null)
-        //     service.setPrice(patchInstructorServiceDto.getPrice());
-
-        // service = instructorServiceRepository.save(service);
-        // log.info("Updated instructor service: {}", service);
+    public InstructorServiceDto patchInstructorService(Long serviceId,
+            PatchInstructorServiceDto patchInstructorServiceDto) {
         
+        
+
+       
         return null;
     }
 

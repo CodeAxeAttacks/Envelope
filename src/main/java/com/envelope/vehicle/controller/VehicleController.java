@@ -21,6 +21,5 @@ public class VehicleController {
     public VehicleDto createVehicle(@RequestBody @Valid VehicleDto vehicleDto) {
         log.info("Creating vehicle: {}", vehicleDto);
         return vehicleService.createVehicle(vehicleDto);
-
     }
 }
