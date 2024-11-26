@@ -1,6 +1,6 @@
 package com.envelope.vehicle.model;
 
-public enum TransmissionType {
+public enum Transmission {
 
    MECHANICAL,
    AUTOMATIC;

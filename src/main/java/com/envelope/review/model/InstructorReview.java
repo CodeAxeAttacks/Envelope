@@ -1,29 +1,34 @@
 package com.envelope.review.model;
 
+import com.envelope.instructor.model.Instructor;
 import com.envelope.user.model.User;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@MappedSuperclass
+@Entity
+@Table(name = "instructor_reviews")
+@NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @ToString
-public abstract class Review {
+public class InstructorReview{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "rate", nullable = false)
@@ -35,5 +40,9 @@ public abstract class Review {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
-
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "instructor_id")
+    private Instructor instructor;
+    
 }

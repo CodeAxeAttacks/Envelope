@@ -1,6 +1,7 @@
 package com.envelope.vehicle.dto;
 
-import com.envelope.vehicle.model.TransmissionType;
+import com.envelope.vehicle.model.Category;
+import com.envelope.vehicle.model.Transmission;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +16,7 @@ public class VehicleDto {
 
     private Integer year;
 
-    private TransmissionType transmissionType;
+    private Transmission transmission;
 
+    private Category category;
 }

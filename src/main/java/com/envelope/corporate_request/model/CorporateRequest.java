@@ -6,7 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.envelope.course.model.VehicleCategory;
 import com.envelope.user.model.User;
-import com.envelope.vehicle.model.TransmissionType;
+import com.envelope.vehicle.model.Transmission;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,7 +59,7 @@ public class CorporateRequest {
 
     @Column(name = "transmission_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private TransmissionType transmissionType;
+    private Transmission transmission;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)

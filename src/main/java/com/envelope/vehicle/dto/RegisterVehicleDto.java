@@ -1,7 +1,7 @@
 package com.envelope.vehicle.dto;
 
-import com.envelope.course.model.VehicleCategory;
-import com.envelope.vehicle.model.TransmissionType;
+import com.envelope.vehicle.model.Category;
+import com.envelope.vehicle.model.Transmission;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,10 +22,10 @@ public class RegisterVehicleDto {
     @NotNull(message = "Field \"year\" must not be null")
     private Integer year;
 
-    @NotNull(message = "Field \"transmissionType\" must not be null")
-    private TransmissionType transmissionType;
+    @NotNull(message = "Field \"transmission\" must not be null")
+    private Transmission transmission;
 
-    @NotNull(message = "Field \"vehicleCategory\" must not be null")
-    private VehicleCategory vehicleCategory;
+    @NotNull(message = "Field \"category\" must not be null")
+    private Category category;
 
 }

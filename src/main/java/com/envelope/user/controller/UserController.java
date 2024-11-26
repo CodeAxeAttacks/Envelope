@@ -28,6 +28,12 @@ public class UserController {
 
     private final UserService userService;
 
+    @GetMapping("/whoami")
+    public UserDto whoAmI() {
+        log.info("Getting whoAmI");
+        return userService.whoAmI();
+    }
+
     @GetMapping
     public List<UserDto> getAll() {
         log.info("Getting all users");
@@ -41,7 +47,7 @@ public class UserController {
     }
     
     @PostMapping("/login")
-    public AuthUserDto postMethodName(@RequestBody @Valid LoginUserDto loginUserDto) {
+    public AuthUserDto login(@RequestBody @Valid LoginUserDto loginUserDto) {
         log.info("Login user: {}", loginUserDto);
         return userService.login(loginUserDto);
     }

@@ -62,9 +62,8 @@ public class DrivingSchool {
     private Instant createdAt;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "admin_driving_school", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "driving_school_id"))
+    @JoinTable(name = "admin_driving_school", joinColumns = @JoinColumn(name = "driving_school_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> admins;
-
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "instructor_driving_school", joinColumns = @JoinColumn(name = "instructor_id"), inverseJoinColumns = @JoinColumn(name = "driving_school_id"))

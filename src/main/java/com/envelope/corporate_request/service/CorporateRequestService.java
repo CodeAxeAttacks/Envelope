@@ -33,7 +33,7 @@ public class CorporateRequestService {
                     .createdAt(request.getCreatedAt())
                     .description(request.getDescription())
                     .vehicleCategory(request.getVehicleCategory())
-                    .transmissionType(request.getTransmissionType())
+                    .transmission(request.getTransmission())
                     .userId(request.getUser().getId())
                     .build()).toList();
     }
@@ -48,7 +48,7 @@ public class CorporateRequestService {
                         .employeeCount(registerCorporateRequestDto.getEmployeeCount())
                         .description(registerCorporateRequestDto.getDescription())
                         .vehicleCategory(registerCorporateRequestDto.getVehicleCategory())
-                        .transmissionType(registerCorporateRequestDto.getTransmissionType())
+                        .transmission(registerCorporateRequestDto.getTransmission())
                         .user(user)
                         .build());
         log.info("Corporate request registered: {}", request);
@@ -60,7 +60,7 @@ public class CorporateRequestService {
                 .createdAt(request.getCreatedAt())
                 .description(request.getDescription())
                 .vehicleCategory(request.getVehicleCategory())
-                .transmissionType(request.getTransmissionType())
+                .transmission(request.getTransmission())
                 .userId(request.getUser().getId())
                 .build();
     }

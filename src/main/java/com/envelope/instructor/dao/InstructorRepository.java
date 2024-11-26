@@ -10,7 +10,5 @@ import com.envelope.user.model.User;
 
 @Repository
 public interface InstructorRepository extends JpaRepository<Instructor, Long> {
-
     Optional<Instructor> findByUser(User user);
-
 }

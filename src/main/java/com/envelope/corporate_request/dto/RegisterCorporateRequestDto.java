@@ -1,7 +1,7 @@
 package com.envelope.corporate_request.dto;
 
 import com.envelope.course.model.VehicleCategory;
-import com.envelope.vehicle.model.TransmissionType;
+import com.envelope.vehicle.model.Transmission;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,8 +27,8 @@ public class RegisterCorporateRequestDto {
     @NotNull(message = "Field \"vehicleCategory\" must not ne null")
     private VehicleCategory vehicleCategory;
 
-    @NotNull(message = "Field \"TransmissionType\" must not ne null")
-    private TransmissionType transmissionType;
+    @NotNull(message = "Field \"Transmission\" must not ne null")
+    private Transmission transmission;
 
 
 }

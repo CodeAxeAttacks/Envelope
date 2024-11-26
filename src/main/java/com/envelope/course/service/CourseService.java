@@ -16,6 +16,7 @@ import com.envelope.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -30,6 +31,19 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final DrivingSchoolRepository drivingSchoolRepository;
     private final JwtService jwtService;
+
+    public List<CourseDto> getAll() {
+        return courseRepository.findAll().stream()
+                .map(course -> CourseDto.builder()
+                    .id(course.getId())
+                    .name(course.getName())
+                    .price(course.getPrice())
+                    .duration(course.getDuration())
+                    .description(course.getDescription())
+                    .vehicleCategory(course.getVehicleCategory())
+                    .studyFormat(course.getStudyFormat())
+                    .build()).toList();
+    }
 
     @Transactional(readOnly = false)
     public CourseDto register(RegisterCourseDto registerCourseDto, Long drivingSchoolId) {
@@ -55,7 +69,14 @@ public class CourseService {
         }
         DrivingSchool drivingSchool = drivingSchoolOptional.get();
 
-        if (!drivingSchool.getAdmins().contains(user)) {
+        boolean found = false;
+        for (User admin : drivingSchool.getAdmins()) {
+            if (admin.getId().equals(user.getId())) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
             String errorMessage = String.format("User with id %d is not an administrator of a driving school with id %d", user.getId(), drivingSchool.getId());
             log.warn(errorMessage);
             throw new NoAccessException(errorMessage);
@@ -81,6 +102,54 @@ public class CourseService {
                 .vehicleCategory(course.getVehicleCategory())
                 .studyFormat(course.getStudyFormat())
                 .build();
+    }
+
+    @Transactional(readOnly = false)
+    public void deleteById(Long drivingSchoolId, Long courseId) {
+        User user = jwtService.currentUser();
+
+        if (drivingSchoolId == null || drivingSchoolId < 0) {
+            String errorMessage = "Driving school's id must not be null or negative";
+            log.warn(errorMessage);
+            throw new InvalidInputException(errorMessage);
+        }
+
+        if (user.getRole() != Role.ADMINISTRATOR && user.getRole() != Role.INSTRUCTOR_AND_ADMINISTRATOR) {
+            String errorMessage = String.format("User with id %d is not an administrator", user.getId());
+            log.warn(errorMessage);
+            throw new NoAccessException(errorMessage);
+        }
+
+        Optional<DrivingSchool> drivingSchoolOptional = drivingSchoolRepository.findById(drivingSchoolId);
+        if (drivingSchoolOptional.isEmpty()) {
+            String errorMessage = String.format("Driving school with id %d does not exist", drivingSchoolId);
+            log.warn(errorMessage);
+            throw new ObjectAlreadyExistsException(errorMessage);
+        }
+        DrivingSchool drivingSchool = drivingSchoolOptional.get();
+
+        boolean found = false;
+        for (User admin : drivingSchool.getAdmins()) {
+            if (admin.getId().equals(user.getId())) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            String errorMessage = String.format("User with id %d is not an administrator of a driving school with id %d", user.getId(), drivingSchool.getId());
+            log.warn(errorMessage);
+            throw new NoAccessException(errorMessage);
+        }
+
+        Optional<Course> courseOptional = courseRepository.findByDrivingSchool(drivingSchool);
+        if (courseOptional.isEmpty()) {
+            String errorMessage = String.format("Driving school with id %d does not hane a course with id {}", drivingSchoolId, courseId);
+            log.warn(errorMessage);
+            throw new ObjectAlreadyExistsException(errorMessage);
+        }
+        Course course = courseOptional.get();
+
+        courseRepository.delete(course);
     }
 
 }

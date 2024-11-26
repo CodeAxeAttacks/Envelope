@@ -29,6 +29,12 @@ public class ReviewController {
         return service.getAllInstructorReviews();
     }
 
+    @GetMapping("/instructor/{instructorId}/review")
+    public List<InstructorReviewDto> getReviewsByInstructorId(@PathVariable("instructorId") Long instructorId) {
+        log.info("Getting all reviews for instructor with id: {}", instructorId);
+        return service.getReviewsByInstructorId(instructorId);
+    }
+
     @GetMapping("/instructor/review/{id}")
     public InstructorReviewDto getInstructorReviewById(@PathVariable(name = "id") Long instructorReviewId) {
         log.info("Getting an instructor review with id: {}", instructorReviewId);

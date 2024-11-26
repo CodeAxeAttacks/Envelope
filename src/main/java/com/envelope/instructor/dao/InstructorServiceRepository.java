@@ -9,6 +9,6 @@ import com.envelope.instructor.model.Instructor;
 import com.envelope.instructor.model.InstructorService;
 
 @Repository
-public interface InstructorServiceRepository extends JpaRepository<InstructorService, Long> {    
+public interface InstructorServiceRepository extends JpaRepository<InstructorService, Long> {
     List<InstructorService> findAllByInstructor(Instructor instructor);
 }

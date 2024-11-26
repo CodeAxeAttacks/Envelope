@@ -21,6 +21,7 @@ import com.envelope.instructor.dto.instructor.PatchInstructorDto;
 import com.envelope.instructor.model.Instructor;
 import com.envelope.security.JwtService;
 import com.envelope.user.dao.UserRepository;
+import com.envelope.user.dto.UserDto;
 import com.envelope.user.model.Role;
 import com.envelope.user.model.User;
 
@@ -42,7 +43,17 @@ public class InstructorService {
         return instructorRepository.findAll().stream()
                 .map(instructor -> InstructorDto.builder()
                         .id(instructor.getId())
-                        .userId(instructor.getUser().getId())
+                        .user(UserDto.builder()
+                                .id(instructor.getUser().getId())
+                                .email(instructor.getUser().getEmail())
+                                .firstName(instructor.getUser().getFirstName())
+                                .lastName(instructor.getUser().getLastName())
+                                .phone(instructor.getUser().getPhone())
+                                .createdAt(instructor.getUser().getCreatedAt())
+                                .role(instructor.getUser().getRole())
+                                .status(instructor.getUser().getStatus())
+                                .instructorId(instructor.getUser().getId())
+                                .build())
                         .experience(instructor.getExperience())
                         .description(instructor.getDescription())
                         .rating(instructor.getRating())
@@ -64,10 +75,21 @@ public class InstructorService {
             throw new ObjectNotFoundException(errorMessage);
         }
         Instructor instructor = instructorOptional.get();
+        User user = instructor.getUser();
 
         return InstructorDto.builder()
                 .id(instructor.getId())
-                .userId(instructor.getUser().getId())
+                .user(UserDto.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .phone(user.getPhone())
+                        .createdAt(user.getCreatedAt())
+                        .role(user.getRole())
+                        .status(user.getStatus())
+                        .instructorId(instructor.getId())
+                        .build())
                 .experience(instructor.getExperience())
                 .description(instructor.getDescription())
                 .rating(instructor.getRating())
@@ -88,16 +110,18 @@ public class InstructorService {
             throw new ObjectNotFoundException(errorMessage);
         }
         Instructor instructor = instructorOptional.get();
-        List<com.envelope.instructor.model.InstructorService> services = instructorServiceRepository.findAllByInstructor(instructor);
+        List<com.envelope.instructor.model.InstructorService> services = instructorServiceRepository
+                .findAllByInstructor(instructor);
 
         return services.stream()
                 .map(service -> InstructorServiceDto.builder()
-                    .id(service.getId())
-                    .name(service.getName())
-                    .description(service.getDescription())
-                    .price(service.getPrice())
-                    .instructorId(service.getInstructor().getId())
-                    .build()).toList();
+                        .id(service.getId())
+                        .name(service.getName())
+                        .description(service.getDescription())
+                        .price(service.getPrice())
+                        .instructorId(service.getInstructor().getId())
+                        .build())
+                .toList();
     }
 
     @Transactional(readOnly = false)
@@ -134,7 +158,17 @@ public class InstructorService {
 
         return InstructorDto.builder()
                 .id(instructor.getId())
-                .userId(user.getId())
+                .user(UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
+                .createdAt(user.getCreatedAt())
+                .role(user.getRole())
+                .status(user.getStatus())
+                .instructorId(instructor.getId())
+                .build())
                 .experience(instructor.getExperience())
                 .description(instructor.getDescription())
                 .rating(instructor.getRating())
@@ -205,7 +239,17 @@ public class InstructorService {
 
         return InstructorDto.builder()
                 .id(instructor.getId())
-                .userId(instructor.getUser().getId())
+                .user(UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
+                .createdAt(user.getCreatedAt())
+                .role(user.getRole())
+                .status(user.getStatus())
+                .instructorId(instructor.getId())
+                .build())
                 .experience(instructor.getExperience())
                 .description(instructor.getDescription())
                 .rating(instructor.getRating())

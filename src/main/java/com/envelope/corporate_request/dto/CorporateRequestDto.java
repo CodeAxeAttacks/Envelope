@@ -5,7 +5,7 @@ import java.time.Instant;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.envelope.course.model.VehicleCategory;
-import com.envelope.vehicle.model.TransmissionType;
+import com.envelope.vehicle.model.Transmission;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public class CorporateRequestDto {
 
     private VehicleCategory vehicleCategory;
 
-    private TransmissionType transmissionType;
+    private Transmission transmission;
 
     private Long userId;
 

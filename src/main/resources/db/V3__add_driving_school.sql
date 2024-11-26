@@ -37,3 +37,23 @@ CREATE TABLE IF NOT EXISTS instructor_driving_school (
     driving_school_id INTEGER REFERENCES driving_schools(id) ON DELETE CASCADE,
     PRIMARY KEY (instructor_id, driving_school_id)
 );
+
+CREATE OR REPLACE FUNCTION update_driving_school_rating()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE driving_schools
+    SET rating = (
+        SELECT AVG(rate)
+        FROM driving_school_reviews
+        WHERE driving_school_id = NEW.driving_school_id
+    )
+    WHERE id = NEW.driving_school_id;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_driving_school_rating_trigger 
+AFTER INSERT OR UPDATE ON driving_school_reviews
+FOR EACH ROW
+EXECUTE FUNCTION update_driving_school_rating();

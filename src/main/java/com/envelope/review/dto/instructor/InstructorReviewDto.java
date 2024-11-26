@@ -1,5 +1,7 @@
 package com.envelope.review.dto.instructor;
 
+import com.envelope.user.dto.UserDto;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,7 +15,7 @@ public class InstructorReviewDto {
 
     private String review;
 
-    private Long userId;
+    private UserDto user;
 
     private Long instructorId;
 

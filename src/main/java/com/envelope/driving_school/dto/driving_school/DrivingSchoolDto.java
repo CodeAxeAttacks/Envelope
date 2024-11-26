@@ -16,6 +16,10 @@ public class DrivingSchoolDto {
 
     private String name;
 
+    private String phoneNumber;
+
+    private String email;
+
     private String address;
 
     private String description;
@@ -27,7 +31,4 @@ public class DrivingSchoolDto {
 
     private List<Long> adminIds;
     
-    private List<Long> additionalServiceIds;
-
-    private List<Long> promotionIds;
 }

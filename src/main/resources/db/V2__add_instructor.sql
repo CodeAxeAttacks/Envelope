@@ -22,3 +22,23 @@ CREATE TABLE IF NOT EXISTS instructor_reviews (
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     instructor_id INTEGER REFERENCES instructors(id) ON DELETE CASCADE
 );
+
+CREATE OR REPLACE FUNCTION update_instructor_rating()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE instructors
+    SET rating = (
+        SELECT AVG(rate)
+        FROM instructor_reviews
+        WHERE instructor_id = NEW.instructor_id
+    )
+    WHERE id = NEW.instructor_id;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_instructor_rating_trigger 
+AFTER INSERT OR UPDATE ON instructor_reviews
+FOR EACH ROW
+EXECUTE FUNCTION update_instructor_rating();

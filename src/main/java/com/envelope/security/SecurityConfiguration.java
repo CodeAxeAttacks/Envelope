@@ -1,5 +1,6 @@
 package com.envelope.security;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 import com.envelope.exception.exceptions.ObjectNotFoundException;
 import com.envelope.user.dao.UserRepository;
@@ -41,7 +43,13 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
-            .cors(AbstractHttpConfigurer::disable)
+            .cors(cors -> cors.configurationSource(request -> {
+                var corsConfiguration = new CorsConfiguration();
+                corsConfiguration.setAllowedOrigins(List.of("*"));
+                corsConfiguration.setAllowedMethods(List.of("*"));
+                corsConfiguration.setAllowedHeaders(List.of("*"));
+                return corsConfiguration;
+            }))
             .authorizeHttpRequests(request -> request
                 .requestMatchers("/user/login", "/user/register").permitAll()
                 .anyRequest().authenticated())
