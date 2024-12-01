@@ -22,9 +22,21 @@ interface PriceData {
     maxPrice: number,
 }
 
-const priceSchema = z.object({
-    minPrice: z.preprocess((num) => parseInt(z.string().parse(num), 10), z.number({ message: 'Минимальная цена должна быть число' }).gte(0, { message: 'Минимальная цена не должна быть отрицательной' })),
-    maxPrice: z.preprocess((num) => parseInt(z.string().parse(num), 10), z.number({ message: 'Максимальная цена должна быть число' }).gte(0, { message: 'Максимальная цена не должна быть отрицательной' })),
+interface FullData {
+    minPrice: number,
+    maxPrice: number,
+    maxDuration: number,
+}
+
+const instructorSchema = z.object({
+    minPrice: z.preprocess((num) => parseInt(z.string().parse(num), 10), z.number({ message: 'Минимальная цена должна быть числом' }).gte(0, { message: 'Минимальная цена не должна быть отрицательной' })),
+    maxPrice: z.preprocess((num) => parseInt(z.string().parse(num), 10), z.number({ message: 'Максимальная цена должна быть числом' }).gte(0, { message: 'Максимальная цена не должна быть отрицательной' })),
+})
+
+const schoolSchema = z.object({
+    minPrice: z.preprocess((num) => parseInt(z.string().parse(num), 10), z.number({ message: 'Минимальная цена должна быть числом' }).gte(0, { message: 'Минимальная цена не должна быть отрицательной' })),
+    maxPrice: z.preprocess((num) => parseInt(z.string().parse(num), 10), z.number({ message: 'Максимальная цена должна быть числом' }).gte(0, { message: 'Максимальная цена не должна быть отрицательной' })),
+    maxDuration: z.preprocess((num) => parseInt(z.string().parse(num), 10), z.number({ message: 'Максимальная длительность обучения должна быть числом' }).gte(0, { message: 'Максимальная длительность обучения не должна быть отрицательной' })),
 })
 
 const Home = () => {
@@ -35,59 +47,101 @@ const Home = () => {
         minRating: 0,
         transmissions: [] as string[],
         instructorOrSchool: 'school',
+        maxDuration: 100,
+        studyFormats: [] as string[],
     });
-    const [sort, setSort] = useState('priceAsc'); // Сортировка
     const [itemsFound, setItemsFound] = useState<SearchResult[]>([]);
     const token = localStorage.getItem('custom-auth-token');
     const navigate = useNavigate();
 
     const {
-        register,
-        handleSubmit,
-        formState: { errors }
+        register: instructorRegister,
+        handleSubmit: handleInstructorSubmit,
+        formState: { errors: instructorErrors }
     } = useForm<PriceData>({
-        resolver: zodResolver(priceSchema)
+        resolver: zodResolver(instructorSchema)
     });
 
-    const onSearch = async (data: PriceData) => {
+    const {
+        register: schoolRegister,
+        handleSubmit: handleSchoolSubmit,
+        formState: { errors: schoolErrors }
+    } = useForm<FullData>({
+        resolver: zodResolver(schoolSchema)
+    });
 
-        if (filters.instructorOrSchool === 'school') {
-            console.log('school');
-        } else {
-            try {
-                const response = await axiosInstance.post(
-                    '/search/instructor',
-                    {
-                        minPrice: data.minPrice,
-                        maxPrice: data.maxPrice,
-                        categories: filters.categories,
-                        minRating: filters.minRating,
-                        transmissions: filters.transmissions,
-                    },
-                    {
-                        headers: {
-                            'Authorization': 'Bearer ' + token,
-                        }
-                    },
-                );
-                setItemsFound(response.data);
-            } catch (error) {
-                if (axios.isAxiosError(error)) {
-                    const status = error.response?.status;
-                    if (status === 403) {
-                        toast.error('Пользователь не авторизован');
-                        navigate('/login');
-                    } else if (status === 404) {
-                        navigate('/');
-                    } else {
-                        toast.error('Нет ответа от сервера');
+    const onSchoolSearch = async (data: FullData) => {
+        try {
+            const response = await axiosInstance.post(
+                '/search/driving-school',
+                {
+                    minPrice: data.minPrice,
+                    maxPrice: data.maxPrice,
+                    categories: filters.categories,
+                    minRating: filters.minRating,
+                    transmissions: filters.transmissions,
+                    maxDuration: data.maxDuration,
+                    studyFormats: filters.studyFormats,
+                },
+                {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
                     }
+                },
+            );
+            setItemsFound(response.data);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                const status = error.response?.status;
+                if (status === 403) {
+                    toast.error('Пользователь не авторизован');
+                    navigate('/login');
+                } else if (status === 404) {
+                    navigate('/');
                 } else {
-                    toast.error('Произошла ошибка');
+                    toast.error('Нет ответа от сервера');
                 }
+            } else {
+                toast.error('Произошла ошибка');
             }
         }
     }
+
+    const onInstructorSearch = async (data: PriceData) => {
+        try {
+            const response = await axiosInstance.post(
+                '/search/instructor',
+                {
+                    minPrice: data.minPrice,
+                    maxPrice: data.maxPrice,
+                    categories: filters.categories,
+                    minRating: filters.minRating,
+                    transmissions: filters.transmissions,
+                },
+                {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                    }
+                },
+            );
+            setItemsFound(response.data);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                const status = error.response?.status;
+                if (status === 403) {
+                    toast.error('Пользователь не авторизован');
+                    navigate('/login');
+                } else if (status === 404) {
+                    navigate('/');
+                } else {
+                    toast.error('Нет ответа от сервера');
+                }
+            } else {
+                toast.error('Произошла ошибка');
+            }
+        }
+    }
+
 
     return (
         <div className="min-h-screen bg-gray-900 text-white">
@@ -97,29 +151,79 @@ const Home = () => {
                     <h2 className="text-2xl font-bold mb-4">Фильтры</h2>
                     <div className="flex flex-col space-y-4">
                         <div>
-                            <label className="block font-semibold mb-2">Цена</label>
-                            <div className='flex items-center'>
-                                <input
-                                    placeholder='От'
-                                    defaultValue={filters.minPrice}
-                                    {...register('minPrice')}
-                                    className="w-full p-3 mb-3 rounded bg-gray-700 text-white placeholder-gray-400 mr-1"
-                                />
-                                <input
-                                    placeholder='До'
-                                    defaultValue={filters.maxPrice}
-                                    {...register('maxPrice')}
-                                    className="w-full p-3 mb-3 rounded bg-gray-700 text-white placeholder-gray-400 ml-1"
-                                />
-                            </div>
-                            {errors.minPrice && <span className='text-red-500'>{errors.minPrice.message}</span>}
-                            {errors.maxPrice && <span className='text-red-500'>{errors.maxPrice.message}</span>}
+                            <label className="block font-semibold mb-2">Тип</label>
+                            <select
+                                value={filters.instructorOrSchool}
+                                onChange={(e) => setFilters({ ...filters, instructorOrSchool: e.target.value })}
+                                className="p-2 w-full rounded bg-gray-700"
+                            >
+                                <option value="school">Автошкола</option>
+                                <option value="instructor">Инструктор</option>
+                            </select>
                         </div>
+
+                        {filters.instructorOrSchool === 'school' ?
+                            <>
+                                <div>
+                                    <label className="block font-semibold mb-2">Цена</label>
+                                    <div className='flex items-center'>
+                                        <input
+                                            placeholder='От'
+                                            defaultValue={filters.minPrice}
+                                            {...schoolRegister('minPrice')}
+                                            className="w-full p-3 mb-3 rounded bg-gray-700 text-white placeholder-gray-400 mr-1"
+                                        />
+                                        <input
+                                            placeholder='До'
+                                            defaultValue={filters.maxPrice}
+                                            {...schoolRegister('maxPrice')}
+                                            className="w-full p-3 mb-3 rounded bg-gray-700 text-white placeholder-gray-400 ml-1"
+                                        />
+                                    </div>
+                                    {schoolErrors.minPrice && <span className='text-red-500'>{schoolErrors.minPrice.message}</span>}
+                                    {schoolErrors.maxPrice && <span className='text-red-500'>{schoolErrors.maxPrice.message}</span>}
+                                </div>
+
+                                <div>
+                                    <label className="block font-semibold mb-2">Максимальная длительность обучения (в днях)</label>
+                                    <div className='flex items-center'>
+                                        <input
+                                            placeholder='До'
+                                            defaultValue={filters.maxDuration}
+                                            {...schoolRegister('maxDuration')}
+                                            className="w-full p-3 mb-3 rounded bg-gray-700 text-white placeholder-gray-400 mr-1"
+                                        />
+                                    </div>
+                                    {schoolErrors.maxDuration && <span className='text-red-500'>{schoolErrors.maxDuration.message}</span>}
+                                </div>
+                            </>
+                            :
+                            <>
+                                <div>
+                                    <label className="block font-semibold mb-2">Цена</label>
+                                    <div className='flex items-center'>
+                                        <input
+                                            placeholder='От'
+                                            defaultValue={filters.minPrice}
+                                            {...instructorRegister('minPrice')}
+                                            className="w-full p-3 mb-3 rounded bg-gray-700 text-white placeholder-gray-400 mr-1"
+                                        />
+                                        <input
+                                            placeholder='До'
+                                            defaultValue={filters.maxPrice}
+                                            {...instructorRegister('maxPrice')}
+                                            className="w-full p-3 mb-3 rounded bg-gray-700 text-white placeholder-gray-400 ml-1"
+                                        />
+                                    </div>
+                                    {instructorErrors.minPrice && <span className='text-red-500'>{instructorErrors.minPrice.message}</span>}
+                                    {instructorErrors.maxPrice && <span className='text-red-500'>{instructorErrors.maxPrice.message}</span>}
+                                </div>
+                            </>}
 
                         <div>
                             <label className="block font-semibold mb-2">Категория</label>
                             <div className="flex gap-2">
-                                {['A', 'B', 'C'].map((cat) => (
+                                {['A', 'B', 'C', 'D'].map((cat) => (
                                     <label key={cat} className="flex items-center gap-2">
                                         <input
                                             type="checkbox"
@@ -171,23 +275,35 @@ const Home = () => {
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block font-semibold mb-2">Тип</label>
-                            <select
-                                value={filters.instructorOrSchool}
-                                onChange={(e) => setFilters({ ...filters, instructorOrSchool: e.target.value })}
-                                className="p-2 w-full rounded bg-gray-700"
-                            >
-                                <option value="school">Автошкола</option>
-                                <option value="instructor">Инструктор</option>
-                            </select>
-                        </div>
+                        {filters.instructorOrSchool === 'school' &&
+                            <div>
+                                <label className="block font-semibold mb-2">Формат обучения</label>
+                                <div className="flex gap-2">
+                                    {['OFFLINE', 'ONLINE'].map((format) => (
+                                        <label key={format} className="flex items-center gap-2">
+                                            <input
+                                                type="checkbox"
+                                                onChange={(e) => {
+                                                    const newFormats = e.target.checked
+                                                        ? [...filters.studyFormats, format]
+                                                        : filters.studyFormats.filter((t) => t !== format);
+                                                    setFilters({ ...filters, studyFormats: newFormats });
+                                                }}
+                                                className='accent-orange-500'
+                                            />
+                                            {format === 'OFFLINE' ? 'Очный' : 'Дистанционный'}
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        }
+
                     </div>
 
                     <div className='flex flex-col gap-4'>
                         <button
                             type="button"
-                            onClick={handleSubmit(onSearch)}
+                            onClick={filters.instructorOrSchool === 'school' ? handleSchoolSubmit(onSchoolSearch) : handleInstructorSubmit(onInstructorSearch)}
                             className="mt-4 bg-orange-500 text-white py-2 rounded hover:bg-orange-600"
                         >
                             Поиск
@@ -222,7 +338,7 @@ const Home = () => {
                         </thead>
                         <tbody>
                             {itemsFound.map((item) => (
-                                <tr key={item.id} className="border-b border-gray-600 hover:bg-gray-700" 
+                                <tr key={item.id} className="border-b border-gray-600 hover:bg-gray-700"
                                     onClick={() => {
                                         if (filters.instructorOrSchool === 'school') {
                                             navigate('/school/' + item.id);

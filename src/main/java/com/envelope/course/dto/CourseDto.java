@@ -1,7 +1,9 @@
 package com.envelope.course.dto;
 
 import com.envelope.course.model.StudyFormat;
-import com.envelope.course.model.VehicleCategory;
+import com.envelope.vehicle.model.Category;
+import com.envelope.vehicle.model.Transmission;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,7 +16,8 @@ public class CourseDto {
     private Float price;
     private Float duration;
     private String description;
-    private VehicleCategory vehicleCategory;
+    private Category category;
+    private Transmission transmission;
     private StudyFormat studyFormat;
 
 }

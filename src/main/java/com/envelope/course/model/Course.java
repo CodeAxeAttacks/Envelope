@@ -1,6 +1,8 @@
 package com.envelope.course.model;
 
 import com.envelope.driving_school.model.DrivingSchool;
+import com.envelope.vehicle.model.Category;
+import com.envelope.vehicle.model.Transmission;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,9 +33,13 @@ public class Course {
     @Column(name = "description", nullable = false, length = 512)
     private String description;
 
-    @Column(name = "vehicle_category", nullable = false)
+    @Column(name = "category", nullable = false)
     @Enumerated(EnumType.STRING)
-    private VehicleCategory vehicleCategory;
+    private Category category;
+
+    @Column(name = "transmission", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Transmission transmission;
 
     @Column(name = "study_format", nullable = false)
     @Enumerated(EnumType.STRING)

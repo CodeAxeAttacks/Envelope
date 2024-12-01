@@ -4,25 +4,33 @@ import Footer from "../components/footer";
 import { Vehicle, VehicleData, defaultVehicle } from "../types/vehicle";
 import { Service, ServiceData, defaultService } from "../types/instructor-service";
 import { defaultUser } from "../types/user";
-import { whoAmI } from "../api/user-client";
 import { useNavigate, useParams } from "react-router-dom";
-import { addService, getInstructorById, getServicesByInstructorId } from "../api/instructor-client";
-import { z } from "zod";
+import { object, z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast, ToastContainer } from "react-toastify";
-import { addVehicle, getVehiclesByInstructorId } from "../api/vehicle-client";
 import { defaultInstructor } from "../types/instructor";
 import axiosInstance from "../api/axios-instance";
 import axios from "axios";
 import InstructorReview, { InstructorReviewData } from "../types/instructor-review";
+import defaultPhoto from "../assets/default-photo.png";
 
 interface DescriptionData {
     description: string;
+    file: File;
 }
 
 const descriptionSchema = z.object({
-    description: z.string().min(1, { message: 'Описание обязательно' })
+    description: z.string().min(1, { message: 'Описание обязательно' }),
+    file: z.preprocess(
+        (file) => (file instanceof FileList && file.length > 0 ? file[0] : file),
+        z.instanceof(File).refine(file => file.size <= 2 * 1024 * 1024, {
+            message: "Файл должен быть меньше 2MB",
+        }).refine(file => ['image/jpeg'].includes(file.type), {
+            message: "Допустимые форматы: JPEG, PNG, GIF",
+        }).optional()
+    ),
+
 })
 
 const serviceSchema = z.object({
@@ -55,6 +63,7 @@ const Instructor = () => {
     const [reviews, setReviews] = useState([] as InstructorReview[]);
     const [newCar, setNewCar] = useState(defaultVehicle);
     const [newService, setNewService] = useState(defaultService);
+    const [image, setImage] = useState(defaultPhoto);
 
     const { id } = useParams<{ id: string }>();
 
@@ -63,6 +72,34 @@ const Instructor = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            try {
+                const response = await axiosInstance.get(
+                    '/instructor/' + id + '/image',
+                    {
+                        headers: {
+                            'Authorization': 'Bearer ' + token,
+                        },
+                        responseType: "blob",
+                    },
+                );
+                const url = URL.createObjectURL(new Blob([response.data]))
+                setImage(url);
+            } catch (error) {
+                if (axios.isAxiosError(error)) {
+                    const status = error.response?.status;
+                    if (status === 403) {
+                        toast.error('Пользователь не авторизован');
+                        navigate('/login');
+                    } else if (status === 404) {
+
+                    } else {
+                        toast.error('Нет ответа от сервера');
+                    }
+                } else {
+                    toast.error('Произошла ошибка');
+                }
+            }
+
             try {
                 const response = await axiosInstance.get(
                     '/instructor/' + id + '/service',
@@ -228,7 +265,9 @@ const Instructor = () => {
         try {
             const response = await axiosInstance.patch(
                 '/instructor',
-                data,
+                {
+                    description: data.description,
+                },
                 {
                     headers: {
                         'Authorization': 'Bearer ' + token,
@@ -238,6 +277,36 @@ const Instructor = () => {
             const newInstructor = response.data;
             setInstructor(newInstructor);
             toast.success('Данные успешно обновлены');
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                const status = error.response?.status;
+                if (status === 403) {
+                    toast.error('Пользователь не авторизован');
+                } else {
+                    toast.error('Нет ответа от сервера');
+                }
+            } else {
+                toast.error('Произошла ошибка');
+            }
+        }
+
+        const formData = new FormData();
+        formData.append("file", data.file);
+    
+        try {
+            const response = await axiosInstance.patch(
+                '/instructor/image',
+                formData,
+                {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        "Content-Type": 'multipart/form-data',
+                    }
+                },
+            );
+            const url = URL.createObjectURL(data.file)
+            setImage(url);
+            toast.success('Фотография успешно обновлена');
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const status = error.response?.status;
@@ -439,12 +508,23 @@ const Instructor = () => {
             <Header />
 
             <div className="container mx-auto p-6">
-                <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <div className="flex bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <img src={image} alt="Instructor Avatar" className="rounded-full w-1/4 mr-3" />
+                    <div className="container">
                     <h1 className="text-3xl font-bold mb-4">{instructor.user.lastName} {user.firstName}</h1>
                     <h2 className="text-2xl font-bold mb-4">Рейтинг: {instructor.rating}</h2>
                     {user.instructorId === instructor.id ?
                         isEditingDescription ? (
                             <div>
+                                <div className="flex space-x-4 mb-3">
+                                <h2>Прикрепить изображение:</h2>
+                                <input 
+                                    type='file'
+                                    {...descriptionRegister('file')}
+                                />
+                                </div>
+                                {descriptionErrors.file && <span className="text-red-500">{descriptionErrors.file.message}</span>}
+                            
                                 <textarea
                                     defaultValue={instructor.description}
                                     rows={3}
@@ -468,7 +548,7 @@ const Instructor = () => {
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex justify-between items-center">
+                            <div className="flex flex-col">
                                 <p className="text-gray-300 mb-6">{instructor.description}</p>
                                 <button
                                     onClick={() => setIsEditingDescription(true)}
@@ -483,6 +563,7 @@ const Instructor = () => {
                             <p className="text-gray-300 mb-6">{instructor.description}</p>
                         </div>
                     )}
+                    </div>
                 </div>
 
                 <div className="bg-gray-800 p-6 rounded-lg shadow-lg mt-6">
@@ -533,10 +614,6 @@ const Instructor = () => {
                                 key={vehicle.id}
                                 className="bg-gray-700 p-4 rounded-lg shadow-lg flex justify-between items-center  space-x-4"
                             >
-                                <img
-                                    alt={vehicle.model}
-                                    className="w-24 h-16 rounded-md object-cover"
-                                />
                                 <div>
                                     <h3 className="text-lg font-bold">{vehicle.model}</h3>
                                     <p>Год выпуска: {vehicle.year}</p>

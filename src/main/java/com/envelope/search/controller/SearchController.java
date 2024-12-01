@@ -22,10 +22,15 @@ import lombok.extern.slf4j.Slf4j;
 public class SearchController {
 
     private final SearchService service;
+
+    @PostMapping("/driving-school")
+    public List<SearchResultDto> searchDrivingSchools(@RequestBody @Valid SearchRequestDto searchRequestDto) {
+        log.info("Getting all instructors by filters: {}", searchRequestDto);
+        return service.searchDrivingSchools(searchRequestDto);
+    }
     
     @PostMapping("/instructor")
     public List<SearchResultDto> searchInstructors(@RequestBody @Valid SearchRequestDto searchRequestDto) {
-        log.info("Getting all instructors by filters: {}", searchRequestDto);
         return service.searchInstructors(searchRequestDto);
     }
 

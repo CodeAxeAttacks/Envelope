@@ -2,6 +2,8 @@ package com.envelope.instructor.controller;
 
 import java.util.List;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -9,7 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.envelope.instructor.dto.instructor.RegisterInstructorDto;
 import com.envelope.instructor.dto.instructor_service.AddInstructorServiceDto;
@@ -44,6 +48,12 @@ public class InstructorController {
         return service.getById(instructorId);
     }
 
+    @GetMapping("/{id}/image")
+    public ResponseEntity<Resource> getImageByInstructorId(@PathVariable(name = "id") Long instrutorId) {
+        log.info("Get image for instructor with id: {}", instrutorId);
+        return service.getImage(instrutorId);
+    }
+
     @GetMapping("/{id}/service")
     public List<InstructorServiceDto> getAllInstructorServicesByInstructorId(@PathVariable(name = "id") Long instructorId) {
         log.info("Get al; instructor's with id {} services", instructorId);
@@ -73,6 +83,12 @@ public class InstructorController {
         log.info("Patch instructor: {}", patchInstructorDto);
         return service.patchInstructor(patchInstructorDto);
     }
+
+    @PatchMapping("/image")
+    public void setImage(@RequestParam("file") MultipartFile file) {
+        log.info("Setting image");
+        service.setImage(file);
+    } 
 
     @PatchMapping("/service/{id}")
     public InstructorServiceDto patchInstructorService(

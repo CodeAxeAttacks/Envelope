@@ -40,7 +40,8 @@ public class CourseService {
                     .price(course.getPrice())
                     .duration(course.getDuration())
                     .description(course.getDescription())
-                    .vehicleCategory(course.getVehicleCategory())
+                    .category(course.getCategory())
+                    .transmission(course.getTransmission())
                     .studyFormat(course.getStudyFormat())
                     .build()).toList();
     }
@@ -87,7 +88,8 @@ public class CourseService {
                 .price(registerCourseDto.getPrice())
                 .duration(registerCourseDto.getDuration())
                 .description(registerCourseDto.getDescription())
-                .vehicleCategory(registerCourseDto.getVehicleCategory())
+                .category(registerCourseDto.getCategory())
+                .transmission(registerCourseDto.getTransmission())
                 .studyFormat(registerCourseDto.getStudyFormat())
                 .drivingSchool(drivingSchool)
                 .build());
@@ -99,7 +101,7 @@ public class CourseService {
                 .price(course.getPrice())
                 .duration(course.getDuration())
                 .description(course.getDescription())
-                .vehicleCategory(course.getVehicleCategory())
+                .category(course.getCategory())
                 .studyFormat(course.getStudyFormat())
                 .build();
     }
@@ -141,7 +143,7 @@ public class CourseService {
             throw new NoAccessException(errorMessage);
         }
 
-        Optional<Course> courseOptional = courseRepository.findByDrivingSchool(drivingSchool);
+        Optional<Course> courseOptional = courseRepository.findByIdAndDrivingSchool(courseId, drivingSchool);
         if (courseOptional.isEmpty()) {
             String errorMessage = String.format("Driving school with id %d does not hane a course with id {}", drivingSchoolId, courseId);
             log.warn(errorMessage);

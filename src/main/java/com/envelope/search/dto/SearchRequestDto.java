@@ -2,6 +2,7 @@ package com.envelope.search.dto;
 
 import java.util.List;
 
+import com.envelope.course.model.StudyFormat;
 import com.envelope.vehicle.model.Category;
 import com.envelope.vehicle.model.Transmission;
 
@@ -30,6 +31,10 @@ public class SearchRequestDto {
     @Max(value=5, message="Field \"minRating\" must not be greater than 5")
     private float minRating;
 
+    private Float maxDuration;
+
     @NotNull(message = "Field \"transmissions\" must not be null")
     private List<Transmission> transmissions;    
+
+    private List<StudyFormat> studyFormats;
 }

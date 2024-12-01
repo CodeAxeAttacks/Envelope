@@ -1,7 +1,9 @@
 package com.envelope.course.dto;
 
 import com.envelope.course.model.StudyFormat;
-import com.envelope.course.model.VehicleCategory;
+import com.envelope.vehicle.model.Category;
+import com.envelope.vehicle.model.Transmission;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -29,7 +31,10 @@ public class RegisterCourseDto {
     private final String description;
 
     @NotNull(message = "Field \"vehicleCategory\" must not be null")
-    private final VehicleCategory vehicleCategory;
+    private final Category category;
+
+    @NotNull(message = "Field \"transmission\" must not be null")
+    private final Transmission transmission;
 
     @NotNull(message = "Field \"studyFormat\" must not be null")
     private final StudyFormat studyFormat;

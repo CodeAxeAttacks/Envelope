@@ -1,10 +1,16 @@
 package com.envelope.instructor.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.envelope.exception.exceptions.ObjectAlreadyExistsException;
 import com.envelope.exception.exceptions.ObjectNotFoundException;
@@ -96,6 +102,39 @@ public class InstructorService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
+    public ResponseEntity<Resource> getImage(Long id) {
+        if (id == null || id < 0) {
+            String errorMessage = "Instructor's id must not be null or negative";
+            log.warn(errorMessage);
+            throw new InvalidInputException(errorMessage);
+        }
+
+        if (instructorRepository.findById(id).isEmpty()) {
+            String errorMessage = String.format("Instructor with id %d does not exist", id);
+            log.warn(errorMessage);
+            throw new ObjectNotFoundException(errorMessage);
+        }
+
+        File dir = new File("./assets/instructor");
+        if (!dir.exists()) {
+            String errorMessage = String.format("Instructor with id %d have not set image yet", id);
+            log.warn(errorMessage);
+            throw new ObjectNotFoundException(errorMessage);
+        }
+
+        File file = new File(dir.getAbsolutePath() + File.separator + id + ".jpeg");
+        if (!file.exists()) {
+            String errorMessage = String.format("Instructor with id %d have not set image yet", id);
+            log.warn(errorMessage);
+            throw new ObjectNotFoundException(errorMessage);
+        }
+
+        Resource resource = new FileSystemResource(file);
+
+        return ResponseEntity.ok().body(resource);
+    }
+
     public List<InstructorServiceDto> getAllInstructorServicesByInstructorId(Long instructorId) {
         if (instructorId == null || instructorId < 0) {
             String errorMessage = "Instructor's id must not be null or negative";
@@ -159,16 +198,16 @@ public class InstructorService {
         return InstructorDto.builder()
                 .id(instructor.getId())
                 .user(UserDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .phone(user.getPhone())
-                .createdAt(user.getCreatedAt())
-                .role(user.getRole())
-                .status(user.getStatus())
-                .instructorId(instructor.getId())
-                .build())
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .phone(user.getPhone())
+                        .createdAt(user.getCreatedAt())
+                        .role(user.getRole())
+                        .status(user.getStatus())
+                        .instructorId(instructor.getId())
+                        .build())
                 .experience(instructor.getExperience())
                 .description(instructor.getDescription())
                 .rating(instructor.getRating())
@@ -240,20 +279,56 @@ public class InstructorService {
         return InstructorDto.builder()
                 .id(instructor.getId())
                 .user(UserDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .phone(user.getPhone())
-                .createdAt(user.getCreatedAt())
-                .role(user.getRole())
-                .status(user.getStatus())
-                .instructorId(instructor.getId())
-                .build())
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .phone(user.getPhone())
+                        .createdAt(user.getCreatedAt())
+                        .role(user.getRole())
+                        .status(user.getStatus())
+                        .instructorId(instructor.getId())
+                        .build())
                 .experience(instructor.getExperience())
                 .description(instructor.getDescription())
                 .rating(instructor.getRating())
                 .build();
+    }
+
+    @Transactional(readOnly = false)
+    public void setImage(MultipartFile file) {
+        User user = jwtService.currentUser();
+
+        if (user.getRole() != Role.INSTRUCTOR && user.getRole() != Role.INSTRUCTOR_AND_ADMINISTRATOR) {
+            String errorMessage = String.format("User with id %d is not an instructor", user.getId());
+            log.warn(errorMessage);
+            throw new ObjectNotFoundException(errorMessage);
+        }
+
+        Instructor instructor = instructorRepository.findByUser(user).get();
+
+        String[] filenameAndType = file.getOriginalFilename().split("\\.");
+        if (filenameAndType.length != 2 || !filenameAndType[1].equals("jpeg"))
+            throw new InvalidInputException("Invalid file type (expected .jpeg)");
+
+        if (file.isEmpty()) {
+            String errorMessage = String.format("File must not be empty");
+            log.warn(errorMessage);
+            throw new InvalidInputException(errorMessage);
+        }
+
+        try {
+            File dir = new File("./assets/instructor");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            File serverFile = new File(dir.getAbsolutePath() + File.separator + instructor.getId() + ".jpeg");
+            file.transferTo(serverFile);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during saving file");
+        }
+
     }
 
     @Transactional(readOnly = false)

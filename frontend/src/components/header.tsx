@@ -23,7 +23,6 @@ function Header() {
             </div>
             <nav className='w-1/3 flex items-center justify-end'>
                 <a href="/home" className="text-white hover:text-orange-500 mx-4">Главная</a>
-                <a href="/individuals" className="text-white hover:text-orange-500 mx-4">Физические лица</a>
                 <Profile />
             </nav>
         </header>
